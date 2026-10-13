@@ -35,7 +35,7 @@ class SubscriptionsRepository extends DefaultRepository
         }
 
         if ($filter->getStatus() !== null) {
-            $select->andWhere('s.status_di=:status')
+            $select->andWhere('s.status_id=:status')
                 ->setParameter('status', $filter->getStatus()->getId());
         }
         $this->applySort($select, $filter);
@@ -49,11 +49,16 @@ class SubscriptionsRepository extends DefaultRepository
      */
     public function getSubscriptionPeriodsByFilter(SubscriptionPeriodFilter $filter): array
     {
-        $select = $this->getDb()->select('p.*')->from('subscripion_period', 'p');
+        $select = $this->getDb()->select('p.*')->from('subscription_period', 'p');
 
         if ($filter->getDateWithin() !== null) {
             $select->andWhere('start_date <= :date_within and end_date >= :date_within')
                 ->setParameter('date_within', $filter->getDateWithin()->format('Y-m-d H:i:s'));
+        }
+
+        if ($filter->getSubscription() !== null) {
+            $select->andWhere('p.subscription_id=:subscription_id')
+                ->setParameter('subscription_id', $filter->getSubscription()->getId());
         }
         if ($filter->getStartDateFrom() !== null) {
             $select->andWhere('start_date >= :start_date_from')
@@ -91,8 +96,8 @@ class SubscriptionsRepository extends DefaultRepository
     public function saveSubscriptionPeriod(SubscriptionPeriod $period): void
     {
         $this->saveModel($period);
-        $this->getDb()->createQueryBuilder()->delete('p.*')->from('subscription_period_payment', 'p')
-            ->andWhere('p.period.id = :period_id')
+        $this->getDb()->createQueryBuilder()->delete('subscription_period_payment')
+            ->andWhere('period_id = :period_id')
             ->setParameter('period_id', $period->getId())
             ->executeQuery();
         foreach ($period->getPayments() as $payment) {

@@ -17,7 +17,7 @@ class SubscriptionFilter extends SortableFilter implements PageableInterface, So
     public function getSortableFields(): array
     {
         return [
-            'id', 'name', 'date_created', 'date_updated', 'start_date', 'end_date', 'price_in_pence'
+            'id', 'date_created', 'date_updated', 'start_date', 'end_date', 'price_in_pence'
         ];
     }
 

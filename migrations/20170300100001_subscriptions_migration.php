@@ -58,6 +58,7 @@ final class SubscriptionsMigration extends BasePantonoMigration
             ->addColumn('start_date', 'datetime')
             ->addColumn('end_date', 'datetime')
             ->addColumn('price_in_pence', 'integer')
+            ->addColumn('date_last_attempted', 'datetime')
             ->create();
 
         $this->tablePrefix('subscription_period_payment', ['id' => false, 'primary_key' => ['period_id', 'payment_id']])

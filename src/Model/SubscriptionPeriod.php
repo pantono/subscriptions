@@ -32,6 +32,7 @@ class SubscriptionPeriod implements SavableInterface
      */
     #[ManyToMany(joinTable: 'subscription_period_payment', joinColumn: 'period_id', inverseJoinColumn: 'payment_id', targetModel: Payment::class)]
     private array $payments = [];
+    private ?\DateTimeInterface $dateLastAttempted = null;
 
     public function getId(): ?int
     {
@@ -112,6 +113,16 @@ class SubscriptionPeriod implements SavableInterface
     public function addPayment(Payment $payment): void
     {
         $this->payments[] = $payment;
+    }
+
+    public function getDateLastAttempted(): ?\DateTimeInterface
+    {
+        return $this->dateLastAttempted;
+    }
+
+    public function setDateLastAttempted(?\DateTimeInterface $dateLastAttempted): void
+    {
+        $this->dateLastAttempted = $dateLastAttempted;
     }
 
     public function getPaymentDescriptor(): string

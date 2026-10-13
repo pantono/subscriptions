@@ -20,6 +20,7 @@ use Pantono\Subscriptions\Model\SubscriptionPeriodItem;
 use Pantono\Subscriptions\Model\SubscriptionTypeItem;
 use Pantono\Subscriptions\Event\PreSubscriptionPeriodItemSaveEvent;
 use Pantono\Subscriptions\Event\PostSubscriptionPeriodItemSaveEvent;
+use Pantono\Payments\Exception\AbstractMandateException;
 
 class Subscriptions
 {
@@ -52,7 +53,7 @@ class Subscriptions
 
     public function saveSubscriptionPeriod(SubscriptionPeriod $period): void
     {
-        $previous = $period->getId() ? $this->hydrator->lookupRecord(Subscription::class, $period->getId()) : null;
+        $previous = $period->getId() ? $this->hydrator->lookupRecord(SubscriptionPeriod::class, $period->getId()) : null;
         $this->eventHelper->fireEvent(PreSubscriptionPeriodSaveEvent::class, $period, $previous);
 
         $this->repository->saveSubscriptionPeriod($period);
@@ -89,9 +90,9 @@ class Subscriptions
     public function processNewSubscriptionPeriods(?OutputInterface $output = null): void
     {
         $filter = new SubscriptionFilter();
-        $filter->setNextBillingDateStart(new \DateTime('00:00:00'));
-        $filter->setNextBillingDateEnd(new \DateTime('23:59:59'));
+        $filter->setNextBillingDateEnd(new \DateTime());
         $filter->setStatus($this->hydrator->lookupRecord(SubscriptionStatus::class, self::STATUS_ACTIVE));
+        $filter->setPerPage(99999);
         foreach ($this->getSubscriptionsByFilter($filter) as $subscription) {
             if ($output) {
                 $output->writeln('Processing subscription ' . $subscription->getId());
@@ -116,13 +117,18 @@ class Subscriptions
         $period->setStartDate($startDate);
         $period->setEndDate($endDate);
         $period->setPriceInPence($subscription->getPriceInPence());
-        $mandate = $subscription->getPaymentMethod();
-        if ($mandate) {
-            $controller = $this->payments->getProviderController($mandate->getPaymentGateway());
-            $payment = $controller->chargeMandate($mandate, $subscription->getPriceInPence(), $period->getPaymentDescriptor());
-            $period->setPayments([$payment]);
-        }
         $this->saveSubscriptionPeriod($period);
+        $mandate = $subscription->getPaymentMethod();
+        if ($mandate && $subscription->getPriceInPence() > 0) {
+            try {
+                $controller = $this->payments->getProviderController($mandate->getPaymentGateway());
+                $payment = $controller->chargeMandate($mandate, $subscription->getPriceInPence(), $period->getPaymentDescriptor());
+                $period->setPayments([$payment]);
+                $this->saveSubscriptionPeriod($period);
+            } catch (AbstractMandateException $e) {
+
+            }
+        }
         return $period;
     }
 
@@ -134,7 +140,7 @@ class Subscriptions
         $item->setPeriodId($period->getId());
         $item->setType($typeItem);
         $item->setQuantity($quantity);
-        $this->repository->saveModel($item);
+        $this->saveSubscriptionPeriodItem($item);
         return $item;
     }
 }
