@@ -8,6 +8,8 @@ use Pantono\Contracts\Attributes\Database\OneToMany;
 use Pantono\Contracts\Attributes\DatabaseTable;
 use Pantono\Payments\Model\Payment;
 use Pantono\Contracts\Attributes\Database\ManyToMany;
+use Pantono\Contracts\Attributes\Database\OneToOne;
+use Pantono\Contracts\Attributes\FieldName;
 
 #[DatabaseTable('subscription_period')]
 class SubscriptionPeriod implements SavableInterface
@@ -15,7 +17,8 @@ class SubscriptionPeriod implements SavableInterface
     use SavableModel;
 
     private ?int $id = null;
-    private int $subscriptionId;
+    #[OneToOne(targetModel: Subscription::class), FieldName('subscription_id')]
+    private ?Subscription $subscription = null;
     private \DateTimeInterface $startDate;
     private \DateTimeInterface $endDate;
     private int $priceInPence;
@@ -40,14 +43,14 @@ class SubscriptionPeriod implements SavableInterface
         $this->id = $id;
     }
 
-    public function getSubscriptionId(): int
+    public function getSubscription(): ?Subscription
     {
-        return $this->subscriptionId;
+        return $this->subscription;
     }
 
-    public function setSubscriptionId(int $subscriptionId): void
+    public function setSubscription(?Subscription $subscription): void
     {
-        $this->subscriptionId = $subscriptionId;
+        $this->subscription = $subscription;
     }
 
     public function getStartDate(): \DateTimeInterface
@@ -105,4 +108,37 @@ class SubscriptionPeriod implements SavableInterface
     {
         $this->payments = $payments;
     }
+
+    public function addPayment(Payment $payment): void
+    {
+        $this->payments[] = $payment;
+    }
+
+    public function getPaymentDescriptor(): string
+    {
+        return sprintf('Payment for %s from ', $this->getSubscription()->getType()->getName() . ' from ' . $this->getStartDate()->format('d/m/Y') . ' to ' . $this->getEndDate()->format('d/m/Y'));
+    }
+
+    public function isPaid(): bool
+    {
+        $total = 0;
+        foreach ($this->getPayments() as $payment) {
+            if ($payment->getStatus()->isCompleted()) {
+                $total += $payment->getAmount();
+            }
+        }
+        return $total >= $this->getPriceInPence();
+    }
+
+    public function isPendingPaid(): bool
+    {
+        $total = 0;
+        foreach ($this->getPayments() as $payment) {
+            if ($payment->getStatus()->isCompleted() || $payment->getStatus()->isPending()) {
+                $total += $payment->getAmount();
+            }
+        }
+        return $total >= $this->getPriceInPence();
+    }
+
 }
