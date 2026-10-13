@@ -211,6 +211,10 @@ class SubscriptionsRepository extends DefaultRepository
                 ->executeStatement() === 1;
     }
 
+    /**
+     * @param SubscriptionTypeFilter $filter
+     * @return array<int,mixed>
+     */
     public function getSubscriptionTypesByFilter(SubscriptionTypeFilter $filter): array
     {
         $select = $this->getDb()->select('t.*')->from($this->pt('subscription_type'));
