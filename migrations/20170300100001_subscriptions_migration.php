@@ -60,7 +60,7 @@ final class SubscriptionsMigration extends BasePantonoMigration
             ->addColumn('price_in_pence', 'integer')
             ->create();
 
-        $this->tablePrefix('subscription_period_payment', ['id' => false, 'primary_key' => ['subscription_id', 'payment_id']])
+        $this->tablePrefix('subscription_period_payment', ['id' => false, 'primary_key' => ['period_id', 'payment_id']])
             ->addLinkedColumn('period_id', $this->addTablePrefix('subscription_period'), 'id')
             ->addLinkedColumn('payment_id', $this->addTablePrefix('payment'), 'id')
             ->create();
