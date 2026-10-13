@@ -8,6 +8,8 @@ use Pantono\Subscriptions\Filter\SubscriptionPeriodFilter;
 use Pantono\Subscriptions\Model\SubscriptionPeriod;
 use Pantono\Subscriptions\Model\Subscription;
 use Pantono\Subscriptions\Subscriptions;
+use Doctrine\DBAL\ParameterType;
+use Pantono\Subscriptions\Filter\SubscriptionTypeFilter;
 
 class SubscriptionsRepository extends DefaultRepository
 {
@@ -207,5 +209,23 @@ class SubscriptionsRepository extends DefaultRepository
                 ->setParameter('active', Subscriptions::STATUS_ACTIVE)
                 ->setParameter('failed', Subscriptions::STATUS_PAYMENT_FAILED)
                 ->executeStatement() === 1;
+    }
+
+    public function getSubscriptionTypesByFilter(SubscriptionTypeFilter $filter): array
+    {
+        $select = $this->getDb()->select('t.*')->from($this->pt('subscription_type'));
+
+        if ($filter->getActive() !== null) {
+            $select->andWhere('t.active = :active')
+                ->setParameter('active', $filter->getActive(), ParameterType::BOOLEAN);
+        }
+        if ($filter->getSearch() !== null) {
+            $select->andWhere('name like :search or description like :search')
+                ->setParameter('search', '%' . $filter->getSearch() . '%');
+        }
+        $this->applyCountAndLimit($select, $filter);
+        $this->applySort($select, $filter);
+
+        return $this->getDb()->fetchAll($select);
     }
 }

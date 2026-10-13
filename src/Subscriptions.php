@@ -25,6 +25,8 @@ use Pantono\Subscriptions\Model\BillingSchedule;
 use InvalidArgumentException;
 use DateTimeImmutable;
 use RuntimeException;
+use Pantono\Subscriptions\Filter\SubscriptionTypeFilter;
+use Pantono\Subscriptions\Model\SubscriptionType;
 
 class Subscriptions
 {
@@ -43,6 +45,14 @@ class Subscriptions
         $this->hydrator = $hydrator;
         $this->eventHelper = $eventHelper;
         $this->payments = $payments;
+    }
+
+    /**
+     * @return SubscriptionType[]
+     */
+    public function getSubscriptionTypesByFilter(SubscriptionTypeFilter $filter): array
+    {
+        return $this->hydrator->hydrateSet(SubscriptionType::class, $this->repository->getSubscriptionTypesByFilter($filter));
     }
 
     public function saveSubscription(Subscription $subscription): void
