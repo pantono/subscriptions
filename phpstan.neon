@@ -1,0 +1,16 @@
+parameters:
+  level: 6
+  paths:
+    - src
+  bootstrapFiles:
+    - vendor/autoload.php
+  excludePaths:
+    - "*/Tests/*"
+  ignoreErrors:
+    - message: '#^Method (.*)::(.*) has parameter (.*) with no value type specified in iterable type array.$#'
+
+services:
+  - class: Pantono\Hydrator\Rules\PhpStan\LocatorMethodExistsRule
+    tags:
+      - phpstan.rules.rule
+

@@ -1,0 +1,36 @@
+{
+  "name": "pantono/subscriptions",
+  "description": "Subscriptions Module for pantono",
+  "type": "library",
+  "require": {
+    "php": ">=8.4",
+    "pantono/contracts": "^1.0",
+    "pantono/utilities": "^1.0",
+    "pantono/phinx": "^0.16",
+    "pantono/database": "^1.0",
+    "pantono/core": "^1.0",
+    "pantono/payments": "^1.0",
+    "pantono/customers": "^1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^12",
+    "phpstan/phpstan": "^2"
+  },
+  "license": "proprietary",
+  "autoload": {
+    "psr-4": {
+      "Pantono\\Subscriptions\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Chris Burton",
+      "email": "chris@chris-burton.co.uk"
+    }
+  ],
+  "config": {
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
+  }
+}

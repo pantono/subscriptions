@@ -33,6 +33,7 @@ class SubscriptionPeriod implements SavableInterface
     #[ManyToMany(joinTable: 'subscription_period_payment', joinColumn: 'period_id', inverseJoinColumn: 'payment_id', targetModel: Payment::class)]
     private array $payments = [];
     private ?\DateTimeInterface $dateLastAttempted = null;
+    private ?string $paymentError = null;
 
     public function getId(): ?int
     {
@@ -127,7 +128,17 @@ class SubscriptionPeriod implements SavableInterface
 
     public function getPaymentDescriptor(): string
     {
-        return sprintf('Payment for %s from ', $this->getSubscription()->getType()->getName() . ' from ' . $this->getStartDate()->format('d/m/Y') . ' to ' . $this->getEndDate()->format('d/m/Y'));
+        return sprintf('Payment for %s from %s to %s', $this->getSubscription()->getType()->getName(), $this->getStartDate()->format('d/m/Y'), $this->getEndDate()->format('d/m/Y'));
+    }
+
+    public function getPaymentError(): ?string
+    {
+        return $this->paymentError;
+    }
+
+    public function setPaymentError(?string $paymentError): void
+    {
+        $this->paymentError = $paymentError;
     }
 
     public function isPaid(): bool
