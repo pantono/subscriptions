@@ -1,6 +1,6 @@
 <?php
 
-namespace Pantono\Subscriptions\Command;
+namespace Pantono\Subscriptions\CommandLine;
 
 use Symfony\Component\Console\Command\Command;
 use Pantono\Subscriptions\Subscriptions;
