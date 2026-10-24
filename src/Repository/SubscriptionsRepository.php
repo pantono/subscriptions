@@ -227,6 +227,14 @@ class SubscriptionsRepository extends DefaultRepository
             $select->andWhere('name like :search or description like :search')
                 ->setParameter('search', '%' . $filter->getSearch() . '%');
         }
+        if ($filter->getIsCompany() !== null) {
+            $select->andWhere('allow_company = :allow_company')
+                ->setParameter('allow_company', $filter->getIsCompany(), ParameterType::BOOLEAN);
+        }
+        if ($filter->getIsCustomer() !== null) {
+            $select->andWhere('allow_customer = :allow_customer')
+                ->setParameter('allow_customer', $filter->getIsCustomer(), ParameterType::BOOLEAN);
+        }
         $this->applyCountAndLimit($select, $filter);
         $this->applySort($select, $filter);
 

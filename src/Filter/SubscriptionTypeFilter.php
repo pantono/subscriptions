@@ -12,6 +12,8 @@ class SubscriptionTypeFilter extends SortableFilter implements PageableInterface
 
     private ?bool $active = null;
     private ?string $search = null;
+    private ?bool $isCustomer = null;
+    private ?bool $isCompany = null;
 
     public function getSortableFields(): array
     {
@@ -39,5 +41,24 @@ class SubscriptionTypeFilter extends SortableFilter implements PageableInterface
     {
         $this->search = $search;
     }
-    
+
+    public function getIsCustomer(): ?bool
+    {
+        return $this->isCustomer;
+    }
+
+    public function setIsCustomer(?bool $isCustomer): void
+    {
+        $this->isCustomer = $isCustomer;
+    }
+
+    public function getIsCompany(): ?bool
+    {
+        return $this->isCompany;
+    }
+
+    public function setIsCompany(?bool $isCompany): void
+    {
+        $this->isCompany = $isCompany;
+    }
 }
