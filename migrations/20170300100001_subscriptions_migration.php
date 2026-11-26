@@ -36,6 +36,7 @@ final class SubscriptionsMigration extends BasePantonoMigration
             ['id' => 2, 'name' => 'Payment Failed', 'active' => true], //Payment failed, but still active
             ['id' => 3, 'name' => 'Cancelled', 'active' => false], //Cancelled by user
             ['id' => 4, 'name' => 'Expired', 'active' => false], //Expired after failed payment
+            ['id' => 5, 'name' => 'Pending', 'active' => false], //Pending in setup stage
         ]);
 
         $this->tablePrefix('subscription')
