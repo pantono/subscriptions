@@ -217,22 +217,22 @@ class SubscriptionsRepository extends DefaultRepository
      */
     public function getSubscriptionTypesByFilter(SubscriptionTypeFilter $filter): array
     {
-        $select = $this->getDb()->select('t.*')->from($this->pt('subscription_type'));
+        $select = $this->getDb()->select('t.*')->from($this->pt('subscription_type'), 't');
 
         if ($filter->getActive() !== null) {
             $select->andWhere('t.active = :active')
                 ->setParameter('active', $filter->getActive(), ParameterType::BOOLEAN);
         }
         if ($filter->getSearch() !== null) {
-            $select->andWhere('name like :search or description like :search')
+            $select->andWhere('t.name like :search or description like :search')
                 ->setParameter('search', '%' . $filter->getSearch() . '%');
         }
         if ($filter->getIsCompany() !== null) {
-            $select->andWhere('allow_company = :allow_company')
+            $select->andWhere('t.allow_company = :allow_company')
                 ->setParameter('allow_company', $filter->getIsCompany(), ParameterType::BOOLEAN);
         }
         if ($filter->getIsCustomer() !== null) {
-            $select->andWhere('allow_customer = :allow_customer')
+            $select->andWhere('t.allow_customer = :allow_customer')
                 ->setParameter('allow_customer', $filter->getIsCustomer(), ParameterType::BOOLEAN);
         }
         $this->applyCountAndLimit($select, $filter);
