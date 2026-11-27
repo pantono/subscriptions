@@ -34,6 +34,7 @@ class Subscriptions
     public const int STATUS_PAYMENT_FAILED = 2;
     public const int STATUS_CANCELLED = 3;
     public const int STATUS_EXPIRED = 4;
+    public const int STATUS_PENDING = 5;
     private SubscriptionsRepository $repository;
     private Hydrator $hydrator;
     private EventHelper $eventHelper;
